@@ -1,3 +1,13 @@
+About this fork
+---------------
+
+This fork of xcwd only looks for processes who have a tty attached to them
+(i. e. running in a terminal). It might be useful for you if you're only
+using xcwd to inspect terminal windows. It fixes a problem with
+an amazing zsh theme, [Powerlevel10k](https://github.com/romkatv/powerlevel10k).
+
+Original README:
+
 xcwd - X current working directory
 ==================================
 xcwd is a simple tool that prints the current working directory of the

@@ -153,6 +153,23 @@ static void freeProcesses(processes_t p)
     free(p);
 }
 
+#ifdef LINUX
+static int isTTY(long pid)
+{
+    char buf[255];
+    char path[64];
+    ssize_t len;
+
+    snprintf(path, sizeof(path), "/proc/%ld/fd/0", pid);
+    if ((len = readlink(path, buf, 255)) != -1)
+        buf[len] = '\0';
+    if(len <= 0) {
+        return 0;
+    }
+    return !strncmp(buf, "/dev/pts/", 9);
+}
+#endif
+
 static processes_t getProcesses(void)
 {
     processes_t p = NULL;
@@ -178,6 +195,10 @@ static processes_t getProcesses(void)
             continue;
         fread(line, 200, 1, tn);
         p->ps[j].pid = atoi(strtok(line, " "));
+        if (!isTTY(p->ps[j].pid)) {
+            fclose(tn);
+            continue;
+        }
         k = snprintf(p->ps[j].name, 32, "%s", strtok(NULL, " ") + 1);
         p->ps[j].name[k - 1] = 0;
         strtok(NULL, " "); // discard process state
@@ -377,4 +398,3 @@ int main(int argc, const char *argv[])
     freeProcesses(p);
     return ret;
 }
-
